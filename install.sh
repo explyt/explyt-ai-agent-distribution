@@ -124,7 +124,9 @@ mkdir -p "$root/install"
 
 printf 'Fetching %s@%s\n' "$PACKAGE" "$tag" >&2
 # Only the variables npm needs; a user's npm_config_* must not reach it (RQ-21).
-tarball="$(cd "$work" && env -i HOME="$HOME" PATH="$node_dir/bin:/usr/bin:/bin" "$node_bin" "$npm_cli" pack "$PACKAGE@$tag" \
+# NODE_OPTIONS: no post-quantum TLS key share, which some routes to the registry freeze (issue #483).
+no_pq='--import=data:text/javascript,import%20tls%20from%22node:tls%22;tls.DEFAULT_ECDH_CURVE=%22X25519:P-256:P-384%22'
+tarball="$(cd "$work" && env -i HOME="$HOME" PATH="$node_dir/bin:/usr/bin:/bin" NODE_OPTIONS="$no_pq" "$node_bin" "$npm_cli" pack "$PACKAGE@$tag" \
   --cache "$cache" --userconfig "$userconfig" --silent)" || fail "cannot fetch $PACKAGE@$tag"
 tar -xzf "$work/$tarball" -C "$work" package/dist/install/installer.js || fail "the $PACKAGE tarball carries no installer"
 

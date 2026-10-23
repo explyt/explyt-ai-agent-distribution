@@ -74,12 +74,17 @@ try {
   # A user's npm_config_* must not reach npm (RQ-21).
   Get-ChildItem env: | Where-Object { $_.Name -like "npm_config_*" } | ForEach-Object { Remove-Item "env:$($_.Name)" }
   $env:Path = "$nodeDir;$env:Path"
+  # npm only: no post-quantum TLS key share, which some routes to the registry freeze (issue #483).
+  $noPq = '--import=data:text/javascript,import%20tls%20from%22node:tls%22;tls.DEFAULT_ECDH_CURVE=%22X25519:P-256:P-384%22'
+  $savedNodeOptions = $env:NODE_OPTIONS
+  $env:NODE_OPTIONS = if ($savedNodeOptions) { "$savedNodeOptions $noPq" } else { $noPq }
   Push-Location $work
   try {
     $tarball = & $nodeBin $npmCli pack "$Package@$tag" --cache $cache --userconfig $userconfig --silent
     if ($LASTEXITCODE -ne 0) { Fail "cannot fetch $Package@$tag" }
   } finally {
     Pop-Location
+    $env:NODE_OPTIONS = $savedNodeOptions
   }
   & $Tar -xzf (Join-Path $work ($tarball | Select-Object -Last 1)) -C $work package/dist/install/installer.js
   if ($LASTEXITCODE -ne 0) { Fail "the $Package tarball carries no installer" }
