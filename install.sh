@@ -76,16 +76,13 @@ machine="$(uname -m)"
 case "$os" in
   Linux) platform="linux" ;;
   Darwin) platform="darwin" ;;
-  *) fail "the platform $os-$machine is not supported (supported: linux-x64, darwin-x64, darwin-arm64, win32-x64)" ;;
+  *) fail "the platform $os-$machine is not supported (supported: linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64)" ;;
 esac
 case "$machine" in
   x86_64|amd64) arch="x64" ;;
   arm64|aarch64) arch="arm64" ;;
-  *) fail "the platform $platform-$machine is not supported (supported: linux-x64, darwin-x64, darwin-arm64, win32-x64)" ;;
+  *) fail "the platform $platform-$machine is not supported (supported: linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64)" ;;
 esac
-if [ "$platform" = "linux" ] && [ "$arch" != "x64" ]; then
-  fail "the platform linux-$arch is not supported (supported: linux-x64, darwin-x64, darwin-arm64, win32-x64)"
-fi
 if [ "$platform" = "linux" ]; then
   if [ -e /etc/alpine-release ] || { command -v ldd >/dev/null 2>&1 && ldd --version 2>&1 | grep -qi musl; }; then
     fail "the platform linux-$arch on musl is not supported (the official Node builds need glibc)"

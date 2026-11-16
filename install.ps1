@@ -32,7 +32,7 @@ if (-not (Test-Path $Tar)) { Fail "the tool '$Tar' is required and was not found
 
 $arch = $env:PROCESSOR_ARCHITECTURE
 if ($env:PROCESSOR_ARCHITEW6432) { $arch = $env:PROCESSOR_ARCHITEW6432 }
-if ($arch -ne "AMD64") { Fail "the platform win32-$arch is not supported (supported: linux-x64, darwin-x64, darwin-arm64, win32-x64)" }
+if ($arch -ne "AMD64") { Fail "the platform win32-$arch is not supported (supported: linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64)" }
 
 $dataHome = if ($env:XDG_DATA_HOME) { $env:XDG_DATA_HOME } else { Join-Path $env:USERPROFILE ".local\share" }
 $root = Join-Path $dataHome "explyt-ai-agent"
